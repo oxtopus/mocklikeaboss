@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<title>Mock Like a a Boss</title>
+
+		<meta name="description" content="A brief intro to the Python Mock library">
+		<meta name="author" content="Austin Marshall">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section data-markdown>
+					<script type="text/template">
+
+# Mock Like a Boss
+![boss](/boss.jpg)
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					<p><q>A Python Mocking and Patching Library for Testing</q></p>
+
+- Officially in Python standard library as of 3.3
+- Available in [PyPi](http://pypi.python.org/pypi/mock) for now:<br>
+	``easy_install mock``
+- <strong>0.8.0 already bundled in trunk</strong>
+- Excellent documentation at [http://www.voidspace.org.uk/python/mock/](http://www.voidspace.org.uk/python/mock/)
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+## Hello, mock!
+
+		>>> from mock import Mock
+		>>> func = Mock(return_value="Hello, mock!")
+		>>> func()
+		'Hello, mock!'
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### Mock objects...
+
+...Create all attributes and methods (dynamically) as you access them
+
+		>>> from mock import Mock
+		>>> func = Mock()
+		>>> hasattr(func, 'foo')
+		True
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### Mock objects...
+
+...Keep track of how they are used
+
+		func = Mock()
+		assert func.called
+		Traceback (most recent call last):
+		  File "<stdin>", line 1, in <module>
+		AssertionError
+
+		func()
+		func.assert_called_with()
+
+		func(1, 2, 3)
+		func.assert_called_with(1, 2, 3)
+
+		func('foo', bar='baz')
+		args, kwargs = func.call_args_list[2]
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### Mock objects...
+
+...can act like other functions
+
+		sumMock = Mock(side_effect=sum)
+		total = sumMock([1,2,4])
+		assert total == 7
+		sumMock.assert_called_once_with([1, 2, 4])
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### patch
+
+Use patch for context.
+
+    def foo():
+      print 'Hello, mock!'
+
+    with patch('sys.stdout', new_callable=StringIO) as stdout:
+      foo()
+      assert stdout.getvalue() == 'Hello, mock!'
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### patch
+
+patch decorators help, too.
+
+    def foo():
+      print 'Hello, mock!'
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test(stdout):
+      foo()
+      assert stdout.getvalue() == 'Hello, mock!\n'
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### Be sneaky
+
+delorean.py:
+
+    import datetime
+
+    def travel(mph=None):
+      return datetime.date.today()
+
+testBackToTheFuture.py:
+
+    @patch.object(delorean, 'datetime', spec=datetime)
+    def testDelorean(datetimeMock):
+      datetimeMock.date.today.return_value = \
+        datetime.date(1955, 11, 5)
+      date = delorean.travel(mph=88)
+      assert date.strftime('%b %d %Y').upper() == 'NOV 05 1955'
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+![AAA](/aaa.jpg)
+
+- <b>A</b>rrange
+- <b>A</b>ct
+- <b>A</b>assert
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+		@patch.object(Foo, 'baz')
+		def foo(my_mocked_func):
+		  my_mocked_func.return_value = "Hello, mock!"
+
+		  fooInstance = Foo()
+		  result = fooInstance.bar()
+
+		  assert isinstance(fooInstance, Foo)
+		  assert result == "Hello, mock!"
+		  my_mocked_func.assert_called_once_with()
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+### Arrange
+
+		@patch.object(Foo, 'baz')
+		def foo(my_mocked_func):
+		  my_mocked_func.return_value = "Hello, mock!"
+
+### Act
+
+		  fooInstance = Foo()
+		  result = fooInstance.bar()
+
+### Assert
+
+		  assert isinstance(fooInstance, Foo)
+		  assert result == "Hello, mock!"
+		  my_mocked_func.assert_called_once_with()
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+
+## Questions?
+
+See me.
+
+					</script>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
