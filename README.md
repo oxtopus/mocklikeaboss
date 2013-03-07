@@ -1,3 +1,1 @@
-### Mock Like a Boss
-
-``python -m SimpleHTTPServer``
+See http://oxtopus.github.com/mocklikeaboss
